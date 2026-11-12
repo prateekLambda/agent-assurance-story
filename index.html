@@ -40,24 +40,43 @@ body {
 nav {
   position: fixed; top: 0; left: 0; right: 0; z-index: 100;
   display: flex; align-items: center; justify-content: space-between;
-  padding: 0 32px; height: 56px;
-  background: rgba(10,12,16,0.85);
-  backdrop-filter: blur(16px);
-  border-bottom: 1px solid var(--border);
+  padding: 0 40px; height: 60px;
+  background: rgba(10,12,16,0.95);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255,255,255,0.1);
 }
-.nav-brand { font-weight: 700; font-size: 15px; letter-spacing: .5px; color: var(--accent); }
-.nav-links { display: flex; gap: 24px; }
-.nav-links a { font-size: 13px; color: var(--muted); text-decoration: none; transition: color .2s; }
-.nav-links a:hover { color: var(--text); }
+.nav-brand { font-weight: 800; font-size: 16px; letter-spacing: 1px; color: var(--accent); display: flex; align-items: center; gap: 8px; }
+.nav-links { display: flex; gap: 8px; }
+.nav-links a {
+  font-size: 13px; color: rgba(255,255,255,0.65); text-decoration: none;
+  padding: 6px 14px; border-radius: 6px; transition: background .2s, color .2s;
+  font-weight: 500;
+}
+.nav-links a:hover { color: #fff; background: rgba(255,255,255,0.08); }
 .nav-cta {
   background: var(--accent); color: #fff; border: none; cursor: pointer;
-  padding: 7px 18px; border-radius: 6px; font-size: 13px; font-weight: 600;
-  font-family: inherit; transition: opacity .2s;
+  padding: 8px 20px; border-radius: 7px; font-size: 13px; font-weight: 700;
+  font-family: inherit; transition: transform .15s, box-shadow .15s;
+  box-shadow: 0 2px 12px rgba(79,142,247,0.35);
 }
-.nav-cta:hover { opacity: .85; }
+.nav-cta:hover { transform: translateY(-1px); box-shadow: 0 4px 20px rgba(79,142,247,0.5); }
+
+/* scroll progress bar */
+#scroll-progress {
+  position: fixed; top: 60px; left: 0; height: 2px; z-index: 101;
+  background: var(--accent); width: 0%; transition: width .1s linear;
+}
 
 /* SECTIONS */
-section { padding: 100px 32px; max-width: 1120px; margin: 0 auto; }
+section { padding: 72px 40px; max-width: 1100px; margin: 0 auto; }
+
+/* alternating section wrappers */
+.section-alt {
+  background: var(--bg2);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+.section-alt > section { padding: 72px 40px; }
 .section-label {
   font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
   color: var(--accent); margin-bottom: 12px;
@@ -66,19 +85,32 @@ h2.section-title {
   font-size: clamp(28px, 4vw, 42px); font-weight: 800; line-height: 1.15;
   margin-bottom: 16px;
 }
-p.section-sub { font-size: 16px; color: var(--muted); max-width: 560px; line-height: 1.7; }
+p.section-sub { font-size: 16px; color: rgba(255,255,255,0.55); max-width: 560px; line-height: 1.7; }
 
 /* SCROLL REVEAL */
-.reveal { opacity: 0; transform: translateY(28px); transition: opacity .6s ease, transform .6s ease; }
+.reveal { opacity: 0; transform: translateY(20px); transition: opacity .5s ease, transform .5s ease; }
 .reveal.visible { opacity: 1; transform: none; }
+
+/* scroll down hint */
+.scroll-hint {
+  position: absolute; bottom: 32px; left: 50%; transform: translateX(-50%);
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  color: rgba(255,255,255,0.3); font-size: 11px; letter-spacing: 1.5px;
+  text-transform: uppercase; animation: hint-fade 3s ease-in-out infinite;
+}
+.scroll-hint::after {
+  content: '↓'; font-size: 18px; animation: bounce-down 1.5s ease-in-out infinite;
+}
+@keyframes bounce-down { 0%,100%{transform:translateY(0)} 50%{transform:translateY(6px)} }
+@keyframes hint-fade { 0%,100%{opacity:.3} 50%{opacity:.7} }
 
 /* ══════════════════════════════════════
    HERO
 ══════════════════════════════════════ */
 #hero {
   min-height: 100vh; display: flex; align-items: center; justify-content: center;
-  flex-direction: column; text-align: center; padding: 80px 32px 60px;
-  position: relative; overflow: hidden;
+  flex-direction: column; text-align: center; padding: 80px 40px 80px;
+  position: relative; overflow: hidden; max-width: 100%;
 }
 #hero::before {
   content: '';
@@ -96,13 +128,13 @@ p.section-sub { font-size: 16px; color: var(--muted); max-width: 560px; line-hei
 @keyframes pulse-dot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(1.4)} }
 
 h1.hero-title {
-  font-size: clamp(36px, 6vw, 72px); font-weight: 900; line-height: 1.08;
-  letter-spacing: -1.5px; margin-bottom: 20px;
+  font-size: clamp(40px, 6.5vw, 80px); font-weight: 900; line-height: 1.05;
+  letter-spacing: -2px; margin-bottom: 24px;
 }
-h1.hero-title .dim { color: var(--muted); }
+h1.hero-title .dim { color: rgba(255,255,255,0.35); }
 p.hero-sub {
-  font-size: clamp(15px, 2vw, 18px); color: var(--muted); max-width: 520px;
-  margin: 0 auto 36px; line-height: 1.65;
+  font-size: clamp(16px, 2vw, 19px); color: rgba(255,255,255,0.55); max-width: 480px;
+  margin: 0 auto 40px; line-height: 1.7;
 }
 .hero-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 60px; }
 .btn-primary {
@@ -135,7 +167,7 @@ p.hero-sub {
 /* ══════════════════════════════════════
    PROBLEM + TOGGLE (the big animated section)
 ══════════════════════════════════════ */
-#problem { padding-top: 80px; padding-bottom: 80px; }
+#problem { padding-top: 72px; padding-bottom: 72px; }
 
 .toggle-row {
   display: flex; align-items: center; gap: 0;
@@ -167,20 +199,33 @@ p.hero-sub {
 /* ══════════════════════════════════════
    SCENE PLAYER
 ══════════════════════════════════════ */
-#scenes { padding-top: 80px; padding-bottom: 80px; }
+#scenes { padding-top: 72px; padding-bottom: 72px; }
 
+.scene-tabs-wrap {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 20px; flex-wrap: wrap; gap: 12px;
+}
 .scene-tabs {
-  display: flex; gap: 0; border-bottom: 1px solid var(--border);
-  margin-bottom: 32px; overflow-x: auto; scrollbar-width: none;
+  display: flex; gap: 4px; background: var(--bg3);
+  border: 1px solid var(--border); border-radius: 10px; padding: 4px;
+  overflow-x: auto; scrollbar-width: none;
 }
 .scene-tabs::-webkit-scrollbar { display: none; }
 .scene-tab {
-  padding: 10px 20px; border: none; background: transparent; cursor: pointer;
-  font-family: inherit; font-size: 13px; font-weight: 600; color: var(--muted);
-  border-bottom: 2px solid transparent; margin-bottom: -1px; white-space: nowrap;
-  transition: color .2s, border-color .2s;
+  padding: 8px 18px; border: none; background: transparent; cursor: pointer;
+  font-family: inherit; font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.45);
+  border-radius: 7px; white-space: nowrap;
+  transition: background .2s, color .2s;
 }
-.scene-tab.active { color: var(--text); border-bottom-color: var(--accent); }
+.scene-tab.active { background: var(--bg); color: var(--text); box-shadow: 0 1px 4px rgba(0,0,0,.5); }
+.scene-playing {
+  font-size: 11px; font-family: 'JetBrains Mono', monospace;
+  color: var(--green); display: flex; align-items: center; gap: 6px;
+}
+.scene-playing::before {
+  content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--green);
+  animation: pulse-dot 1.5s infinite;
+}
 
 .scene-kicker {
   font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted);
@@ -303,7 +348,7 @@ p.hero-sub {
 /* ══════════════════════════════════════
    PIPELINE
 ══════════════════════════════════════ */
-#pipeline { padding-top: 80px; padding-bottom: 80px; }
+#pipeline { padding-top: 72px; padding-bottom: 72px; }
 
 .pipeline-steps {
   display: flex; gap: 0; margin-top: 40px; position: relative;
@@ -331,7 +376,7 @@ p.hero-sub {
 /* ══════════════════════════════════════
    VERDICTS
 ══════════════════════════════════════ */
-#verdicts { padding-top: 80px; padding-bottom: 80px; }
+#verdicts { padding-top: 72px; padding-bottom: 72px; }
 
 .verdicts-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 40px; }
 @media (max-width: 680px) { .verdicts-grid { grid-template-columns: 1fr; } }
@@ -375,7 +420,7 @@ p.hero-sub {
 /* ══════════════════════════════════════
    RED TEAM
 ══════════════════════════════════════ */
-#redteam { padding-top: 80px; padding-bottom: 80px; }
+#redteam { padding-top: 72px; padding-bottom: 72px; }
 .redteam-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 32px; }
 @media (max-width: 680px) { .redteam-grid { grid-template-columns: 1fr; } }
 
@@ -396,7 +441,7 @@ p.hero-sub {
 /* ══════════════════════════════════════
    COMPARE (evals vs assurance)
 ══════════════════════════════════════ */
-#compare { padding-top: 80px; padding-bottom: 80px; }
+#compare { padding-top: 72px; padding-bottom: 72px; }
 
 .compare-table {
   margin-top: 32px; border: 1px solid var(--border); border-radius: 12px; overflow: hidden;
@@ -423,7 +468,7 @@ p.hero-sub {
 /* ══════════════════════════════════════
    LOCAL FIRST
 ══════════════════════════════════════ */
-#local { padding-top: 80px; padding-bottom: 80px; }
+#local { padding-top: 72px; padding-bottom: 72px; }
 .local-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 32px; }
 @media (max-width: 680px) { .local-grid { grid-template-columns: 1fr; } }
 
@@ -472,6 +517,9 @@ footer a { color: var(--accent); text-decoration: none; }
 </head>
 <body>
 
+<!-- SCROLL PROGRESS -->
+<div id="scroll-progress"></div>
+
 <!-- NAV -->
 <nav>
   <div class="nav-brand">◈ ROOK</div>
@@ -490,9 +538,11 @@ footer a { color: var(--accent); text-decoration: none; }
   <h1 class="hero-title">Your agent says<br>it worked.<br><span class="dim">Prove it.</span></h1>
   <p class="hero-sub">Rook verifies AI agent behavior by what it <em>did</em> — tool calls, file writes, API requests — not what it <em>claimed</em>.</p>
   <div class="hero-actions">
-    <button class="btn-primary" onclick="document.getElementById('scenes').scrollIntoView({behavior:'smooth'})">See Real Failures</button>
+    <button class="btn-primary" onclick="document.getElementById('scenes').scrollIntoView({behavior:'smooth'})">See Real Failures →</button>
     <button class="btn-ghost" onclick="document.getElementById('pipeline').scrollIntoView({behavior:'smooth'})">How It Works</button>
   </div>
+
+  <div class="scroll-hint">Scroll to explore</div>
 
   <!-- ORBITAL SVG -->
   <svg id="orbital-svg" viewBox="0 0 480 480" xmlns="http://www.w3.org/2000/svg">
@@ -737,17 +787,21 @@ footer a { color: var(--accent); text-decoration: none; }
 
 
 <!-- SCENE PLAYER -->
+<div class="section-alt">
 <section id="scenes">
   <div class="section-label reveal">Live Failure Scenarios</div>
   <h2 class="section-title reveal">Rook catches what your tests miss</h2>
   <p class="section-sub reveal">Four real failure patterns. Watch Rook surface the evidence — or the absence of it — in real time.</p>
 
-  <div class="reveal" style="margin-top:40px;">
-    <div class="scene-tabs" role="tablist">
-      <button class="scene-tab active" onclick="loadScene(0)" id="tab-0">Hallucinated refund</button>
-      <button class="scene-tab" onclick="loadScene(1)" id="tab-1">Production deleted</button>
-      <button class="scene-tab" onclick="loadScene(2)" id="tab-2">Prompt injection</button>
-      <button class="scene-tab" onclick="loadScene(3)" id="tab-3">Right answer, no proof</button>
+  <div class="reveal" style="margin-top:32px;">
+    <div class="scene-tabs-wrap">
+      <div class="scene-tabs" role="tablist">
+        <button class="scene-tab active" onclick="loadScene(0)" id="tab-0">Hallucinated refund</button>
+        <button class="scene-tab" onclick="loadScene(1)" id="tab-1">Production deleted</button>
+        <button class="scene-tab" onclick="loadScene(2)" id="tab-2">Prompt injection</button>
+        <button class="scene-tab" onclick="loadScene(3)" id="tab-3">Right answer, no proof</button>
+      </div>
+      <div class="scene-playing" id="scene-playing">Playing</div>
     </div>
     <div class="scene-kicker" id="scene-kicker">Refund-desk reference agent · SC-007 · Run 01M03BHF4D3DE62M78ZQ2XK953</div>
 
@@ -770,6 +824,7 @@ footer a { color: var(--accent); text-decoration: none; }
     </div>
   </div>
 </section>
+</div>
 
 <!-- PIPELINE -->
 <section id="pipeline">
@@ -818,6 +873,7 @@ footer a { color: var(--accent); text-decoration: none; }
 </section>
 
 <!-- VERDICTS -->
+<div class="section-alt">
 <section id="verdicts">
   <div class="section-label reveal">The Three Verdicts</div>
   <h2 class="section-title reveal">Judge what agents <em>did</em>, not what they said</h2>
@@ -876,6 +932,7 @@ footer a { color: var(--accent); text-decoration: none; }
     <p style="font-size:12px;color:var(--muted);margin-top:16px;">Percentage of evaluated agents at each observability tier (TestMu AI internal survey, Oct 2026)</p>
   </div>
 </section>
+</div>
 
 <!-- RED TEAM -->
 <section id="redteam">
@@ -965,6 +1022,7 @@ footer a { color: var(--accent); text-decoration: none; }
 </section>
 
 <!-- LOCAL FIRST -->
+<div class="section-alt">
 <section id="local">
   <div class="section-label reveal">Local-First · Zero Trust</div>
   <h2 class="section-title reveal">Your agent data never leaves your machine</h2>
@@ -1001,6 +1059,7 @@ footer a { color: var(--accent); text-decoration: none; }
     </div>
   </div>
 </section>
+</div>
 
 <!-- CLOSING -->
 <section id="closing">
@@ -1241,6 +1300,15 @@ function animateLadder() {
     bar.style.width = target + '%';
   });
 }
+
+// ═══════════════════════════════════════════
+// SCROLL PROGRESS BAR
+// ═══════════════════════════════════════════
+const progressBar = document.getElementById('scroll-progress');
+window.addEventListener('scroll', () => {
+  const pct = (window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100;
+  progressBar.style.width = Math.min(pct, 100) + '%';
+}, { passive: true });
 
 // ═══════════════════════════════════════════
 // SCROLL REVEAL + LADDER
