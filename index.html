@@ -159,7 +159,9 @@ p.hero-sub {
 .wd-src.on { fill: rgba(79,142,247,0.3); }
 
 /* ── Step mode (one section at a time) ── */
-body.step-mode > section:not(.step-on), body.step-mode > footer:not(.step-on) { display: none !important; }
+body.step-mode > section:not(.step-on), body.step-mode > .section-alt > section:not(.step-on), body.step-mode > footer:not(.step-on) { display: none !important; }
+body.step-mode > .section-alt:not(:has(.step-on)) { display: none !important; }
+body.step-mode > .section-alt > section.step-on { display: block; animation: step-in .35s ease; }
 body.step-mode > section.step-on { display: flex; flex-direction: column; animation: step-in .35s ease; }
 body.step-mode > section#hero.step-on { align-items: center; justify-content: center; }
 body.step-mode > footer.step-on { display: block; }
