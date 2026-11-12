@@ -354,17 +354,36 @@ p.hero-sub {
 .pipeline-step {
   flex: 1; min-width: 140px; padding: 20px 16px 20px 20px;
   background: var(--bg2); border: 1px solid var(--border);
-  position: relative; transition: border-color .2s;
+  position: relative; transition: border-color .2s, background .2s, transform .15s;
+  cursor: pointer; user-select: none;
 }
 .pipeline-step:not(:first-child) { border-left: none; }
 .pipeline-step:first-child { border-radius: 10px 0 0 10px; }
 .pipeline-step:last-child { border-radius: 0 10px 10px 0; }
-.pipeline-step:hover { border-color: rgba(79,142,247,0.4); z-index: 2; }
+.pipeline-step:hover { border-color: rgba(79,142,247,0.5); background: rgba(79,142,247,0.05); z-index: 2; }
+.pipeline-step:active { transform: scale(0.98); }
 .pipeline-step::after {
   content: '→'; position: absolute; right: -14px; top: 50%; transform: translateY(-50%);
-  font-size: 18px; color: var(--muted); z-index: 3;
+  font-size: 18px; color: var(--muted); z-index: 3; pointer-events: none;
 }
 .pipeline-step:last-child::after { display: none; }
+.pipeline-step.ps-active {
+  background: rgba(79,142,247,0.1) !important;
+  border-color: var(--accent) !important;
+  box-shadow: inset 0 0 0 1px rgba(79,142,247,0.3);
+  z-index: 2;
+}
+.pipeline-step.ps-active + .pipeline-step { border-left: 1px solid var(--border); }
+.pipeline-step.ps-active .step-num { color: #fff; }
+.pipeline-step.ps-active .step-cmd { color: #fff; font-weight: 700; }
+.pipeline-step.ps-active .step-title { color: var(--accent); }
+.ps-hint {
+  font-size: 10px; color: rgba(255,255,255,0.2); margin-top: 10px;
+  font-family: 'JetBrains Mono', monospace; letter-spacing: .3px;
+  transition: color .2s;
+}
+.pipeline-step:hover .ps-hint { color: var(--accent); }
+.pipeline-step.ps-active .ps-hint { color: var(--accent); }
 .step-num { font-size: 10px; font-weight: 700; color: var(--accent); letter-spacing: 1px; margin-bottom: 8px; }
 .step-cmd { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent); margin-bottom: 6px; }
 .step-title { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
@@ -960,35 +979,40 @@ footer a { color: var(--accent); text-decoration: none; }
   <p class="section-sub reveal">One install. One command. Rook discovers your agent's surfaces, generates a full test suite, and judges every run against evidence.</p>
 
   <div class="pipeline-steps reveal">
-    <div class="pipeline-step">
+    <div class="pipeline-step" id="ps-0" onclick="jumpToPhase(0)">
       <div class="step-num">01</div>
       <div class="step-cmd">rook /explore</div>
       <div class="step-title">Discover</div>
       <div class="step-desc">Maps every tool, flow, and surface your agent exposes</div>
+      <div class="ps-hint">▶ run live</div>
     </div>
-    <div class="pipeline-step">
+    <div class="pipeline-step" id="ps-1" onclick="jumpToPhase(1)">
       <div class="step-num">02</div>
       <div class="step-cmd">rook /generate</div>
       <div class="step-title">Generate</div>
       <div class="step-desc">Creates 16 test categories: functional, non-functional, adversarial</div>
+      <div class="ps-hint">▶ run live</div>
     </div>
-    <div class="pipeline-step">
+    <div class="pipeline-step" id="ps-2" onclick="jumpToPhase(2)">
       <div class="step-num">03</div>
       <div class="step-cmd">rook /profile add</div>
       <div class="step-title">Connect</div>
       <div class="step-desc">Links to your agent's runtime — 4 modes: terminal, CI, browser, coding agent</div>
+      <div class="ps-hint">▶ run live</div>
     </div>
-    <div class="pipeline-step">
+    <div class="pipeline-step" id="ps-3" onclick="jumpToPhase(3)">
       <div class="step-num">04</div>
       <div class="step-cmd">rook /run</div>
       <div class="step-title">Run & Judge</div>
       <div class="step-desc">Executes suite, records every tool call, verifies each claim with evidence</div>
+      <div class="ps-hint">▶ run live</div>
     </div>
-    <div class="pipeline-step">
+    <div class="pipeline-step" id="ps-4" onclick="jumpToPhase(4)">
       <div class="step-num">05</div>
       <div class="step-cmd">rook /ui</div>
       <div class="step-title">Report</div>
       <div class="step-desc">Pass rate + assurance gap. Drill into any criterion and see the evidence chain</div>
+      <div class="ps-hint">▶ run live</div>
     </div>
   </div>
 
@@ -1632,18 +1656,9 @@ function lrReset() {
   if (replay) replay.style.display = 'none';
 }
 
-async function startLiveRun(force) {
-  if (lrAnimating && !force) return;
-  lrStopClock();
-  lrAnimating = true;
-  lrReset();
-
-  const dot = document.getElementById('lr-dot');
-  if (dot) dot.className = 'lr-status-dot lr-running';
-  lrStartClock();
-  await lrSleep(300);
-
-  // ── Phase 0: /explore ──────────────────────────────
+// ─── Per-phase functions ───────────────────────────
+async function lrPhaseExplore(withSpacer) {
+  if (withSpacer) lrAddSpacer();
   lrSetPhase(0, '/explore');
   await lrTypeCmd('rook /explore');
   await lrSleep(240);
@@ -1655,9 +1670,10 @@ async function startLiveRun(force) {
   await lrSleep(210);
   lrAddLine('<span class="lr-k">calls modelled       </span> <span class="lr-vb">7</span>  <span class="lr-dim">mcp · agent · service · filesystem</span>');
   await lrSleep(360);
-  lrAddSpacer();
+}
 
-  // ── Phase 1: /generate ─────────────────────────────
+async function lrPhaseGenerate(withSpacer) {
+  if (withSpacer) lrAddSpacer();
   lrSetPhase(1, '/generate');
   await lrTypeCmd('rook /generate');
   await lrSleep(240);
@@ -1669,9 +1685,10 @@ async function startLiveRun(force) {
   await lrSleep(210);
   lrAddLine('<span class="lr-k">findings   </span> <span class="lr-va">5</span>  <span class="lr-dim">4 HIGH · 1 MEDIUM — surfaced before first run</span>');
   await lrSleep(360);
-  lrAddSpacer();
+}
 
-  // ── Phase 2: /profile ──────────────────────────────
+async function lrPhaseProfile(withSpacer) {
+  if (withSpacer) lrAddSpacer();
   lrSetPhase(2, '/profile');
   await lrTypeCmd('rook /profile add');
   await lrSleep(240);
@@ -1681,73 +1698,106 @@ async function startLiveRun(force) {
   await lrSleep(200);
   lrAddLine('<span class="lr-k">command  </span> <span class="lr-vb">python3 -m incident_scribe</span>');
   await lrSleep(360);
-  lrAddSpacer();
+}
 
-  // ── Phase 3: /run ──────────────────────────────────
+async function lrPhaseRun(withSpacer) {
+  if (withSpacer) lrAddSpacer();
   lrSetPhase(3, '/run');
   await lrTypeCmd('rook /run');
   await lrSleep(240);
   lrAddLine('<span class="lr-dim">concurrency 4 · executing 7 scenarios...</span>');
   await lrSleep(480);
 
-  // reveal scenario grid
   const scSection = document.getElementById('lr-sc-section');
-  if (scSection) {
-    scSection.style.display = 'block';
-    scSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-  }
+  if (scSection) scSection.style.display = 'block';
 
   let pass = 0, fail = 0, utv = 0, totalTurns = 0;
-
   for (const sc of LR_SCENARIOS) {
     const rows = document.getElementById('lr-sc-rows');
     if (!rows) continue;
-
     const row = document.createElement('div');
     row.className = 'lr-sc-row';
     row.innerHTML = `<span class="lr-sc-id">${sc.id}</span><span class="lr-sc-title">${sc.title}</span><span class="lr-badge lr-badge-spin">●</span><span class="lr-sc-pct">—</span>`;
     rows.appendChild(row);
-
     await lrSleep(sc.ms);
-
     const cls = sc.verdict === 'PASS' ? 'lr-badge-pass' : sc.verdict === 'FAIL' ? 'lr-badge-fail' : 'lr-badge-utv';
     row.innerHTML = `<span class="lr-sc-id">${sc.id}</span><span class="lr-sc-title">${sc.title}</span><span class="lr-badge ${cls}">${sc.verdict}</span><span class="lr-sc-pct">${sc.pct}</span>`;
-
     if (sc.verdict === 'PASS') pass++;
     else if (sc.verdict === 'FAIL') fail++;
     else utv++;
     totalTurns += sc.turns;
-
-    const mPass = document.getElementById('m-pass');
-    const mFail = document.getElementById('m-fail');
-    const mUtv  = document.getElementById('m-utv');
-    const mTurns = document.getElementById('m-turns');
-    const mPct  = document.getElementById('m-pct');
-    if (mPass) mPass.textContent = pass;
-    if (mFail) mFail.textContent = fail;
-    if (mUtv)  mUtv.textContent  = utv;
-    if (mTurns) mTurns.textContent = totalTurns;
+    const g = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
+    g('m-pass', pass); g('m-fail', fail); g('m-utv', utv); g('m-turns', totalTurns);
+    const mPct = document.getElementById('m-pct');
     if (mPct) mPct.textContent = (pass + fail) > 0 ? Math.round(pass / (pass + fail) * 100) + '%' : '—';
   }
-
   const mTime = document.getElementById('m-time');
   if (mTime) mTime.textContent = '212s';
+}
 
-  // ── Phase 4: findings ──────────────────────────────
+async function lrPhaseFindings(withSpacer) {
+  if (withSpacer) lrAddSpacer();
   lrSetPhase(4, 'Findings');
   const prog = document.getElementById('lr-progress');
   if (prog) prog.style.width = '100%';
-  if (dot) dot.className = 'lr-status-dot lr-done';
-
-  await lrSleep(500);
+  await lrSleep(400);
   const findingsArea = document.getElementById('lr-findings-area');
   if (findingsArea) findingsArea.style.display = 'flex';
-
   for (const fid of ['lr-f1', 'lr-f2', 'lr-gap']) {
     await lrSleep(380);
     const el = document.getElementById(fid);
     if (el) el.classList.add('lr-finding-visible');
   }
+}
+
+// ─── Highlight the clicked card ────────────────────
+function lrSetActiveStep(phase) {
+  [0,1,2,3,4].forEach(i => {
+    const el = document.getElementById('ps-' + i);
+    if (el) el.classList.toggle('ps-active', i === phase);
+  });
+}
+
+// ─── Jump to a single phase (card click) ───────────
+async function jumpToPhase(phase) {
+  if (lrAnimating) { lrStopClock(); lrAnimating = false; }
+  lrReset();
+  lrAnimating = true;
+  lrSetActiveStep(phase);
+  const dot = document.getElementById('lr-dot');
+  if (dot) dot.className = 'lr-status-dot lr-running';
+  lrStartClock();
+  const lrEl = document.getElementById('live-run');
+  if (lrEl) lrEl.scrollIntoView({ block: 'nearest' });
+  await lrSleep(200);
+  const phaseFns = [lrPhaseExplore, lrPhaseGenerate, lrPhaseProfile, lrPhaseRun, lrPhaseFindings];
+  await phaseFns[phase](false);
+  if (dot) dot.className = 'lr-status-dot lr-done';
+  lrStopClock();
+  lrAnimating = false;
+  const replay = document.getElementById('lr-replay');
+  if (replay) replay.style.display = 'inline-block';
+}
+
+// ─── Full run (auto-play / replay) ─────────────────
+async function startLiveRun(force) {
+  if (lrAnimating && !force) return;
+  lrStopClock();
+  lrAnimating = true;
+  lrReset();
+  lrSetActiveStep(-1);
+
+  const dot = document.getElementById('lr-dot');
+  if (dot) dot.className = 'lr-status-dot lr-running';
+  lrStartClock();
+  await lrSleep(300);
+
+  await lrPhaseExplore(false);
+  await lrPhaseGenerate(true);
+  await lrPhaseProfile(true);
+  await lrPhaseRun(true);
+  if (dot) dot.className = 'lr-status-dot lr-done';
+  await lrPhaseFindings(true);
 
   lrStopClock();
   lrAnimating = false;
