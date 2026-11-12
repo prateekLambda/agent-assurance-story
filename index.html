@@ -148,6 +148,15 @@ p.hero-sub {
 .btn-ghost:hover { border-color: rgba(255,255,255,0.3); }
 
 /* ORBITAL SVG */
+
+/* live diagram */
+.wd-flow { stroke-dasharray: 6 5; animation: wd-dash 0.9s linear infinite; }
+@keyframes wd-dash { to { stroke-dashoffset: -22; } }
+.wd-act { transition: fill .25s; }
+.wd-act.on { fill: #fff; font-weight: 700; }
+.wd-chk { transition: stroke .3s, fill .3s; }
+.wd-chk.on { stroke: #4f8ef7; fill: rgba(79,142,247,0.2); }
+.wd-src.on { fill: rgba(79,142,247,0.3); }
 /* ── Rook demo widget (hero) ───────────────── */
 #rook-demo {
   width: min(760px, 92vw); margin: 0 auto; text-align: left;
@@ -1444,6 +1453,59 @@ footer a { color: var(--accent); text-decoration: none; }
   }
 
   setTimeout(() => runScene(0), 900);
+})();
+
+
+// ═══════════════════════════════════════════
+// LIVE PROBLEM DIAGRAMS
+// ═══════════════════════════════════════════
+(function(){
+  const NS='http://www.w3.org/2000/svg';
+  document.querySelectorAll('.world-panel svg').forEach((svg, si) => {
+    // flowing lines + packets
+    svg.querySelectorAll('line').forEach((ln, i) => {
+      ln.classList.add('wd-flow');
+      const c = ln.getAttribute('stroke') || '#4f8ef7';
+      const col = c.startsWith('rgba') ? '#4f8ef7' : (c === '#4b5563' || c === '#6b7280' ? '#9ca3af' : c);
+      const dot = document.createElementNS(NS,'circle');
+      dot.setAttribute('r','4'); dot.setAttribute('fill', col);
+      dot.setAttribute('style','filter:drop-shadow(0 0 4px '+col+')');
+      const m = document.createElementNS(NS,'animateMotion');
+      m.setAttribute('path',`M${ln.getAttribute('x1')},${ln.getAttribute('y1')} L${ln.getAttribute('x2')},${ln.getAttribute('y2')}`);
+      m.setAttribute('dur', (1.4 + (i%3)*0.3)+'s');
+      m.setAttribute('begin', (i*0.35)+'s');
+      m.setAttribute('repeatCount','indefinite');
+      dot.appendChild(m); svg.appendChild(dot);
+    });
+    // agent actions: texts starting with arrow
+    const acts=[...svg.querySelectorAll('text')].filter(t=>t.textContent.trim().startsWith('→'));
+    acts.forEach(t=>t.classList.add('wd-act'));
+    // source chips
+    const srcs=[...svg.querySelectorAll('rect')].filter(r=>r.getAttribute('y')==='30');
+    srcs.forEach(r=>r.classList.add('wd-src'));
+    // rook checks
+    const chks=[...svg.querySelectorAll('rect')].filter(r=>r.getAttribute('fill')==='rgba(79,142,247,0.07)');
+    chks.forEach(r=>r.classList.add('wd-chk'));
+    // scanning beam in rook box
+    const rook=[...svg.querySelectorAll('rect')].find(r=>r.getAttribute('fill')==='#071428');
+    if (rook) {
+      const x=+rook.getAttribute('x'), y=+rook.getAttribute('y'), w=+rook.getAttribute('width'), h=+rook.getAttribute('height');
+      const beam=document.createElementNS(NS,'rect');
+      beam.setAttribute('x',x+4); beam.setAttribute('width',w-8); beam.setAttribute('height','3'); beam.setAttribute('rx','1.5');
+      beam.setAttribute('fill','rgba(79,142,247,0.6)'); beam.setAttribute('style','filter:drop-shadow(0 0 6px #4f8ef7)');
+      const a=document.createElementNS(NS,'animate');
+      a.setAttribute('attributeName','y'); a.setAttribute('values',`${y+30};${y+h-10};${y+30}`);
+      a.setAttribute('dur','3s'); a.setAttribute('repeatCount','indefinite');
+      beam.appendChild(a); svg.appendChild(beam);
+    }
+    let step=0;
+    setInterval(()=>{
+      acts.forEach((t,i)=>t.classList.toggle('on', i===step%acts.length));
+      srcs.forEach((r,i)=>r.classList.toggle('on', i===step%srcs.length));
+      chks.forEach((r,i)=>r.classList.toggle('on', i===step%chks.length));
+      step++;
+    }, 750);
+  });
 })();
 
 // ═══════════════════════════════════════════
