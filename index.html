@@ -764,12 +764,12 @@ footer a { color: var(--accent); text-decoration: none; }
 <!-- NAV -->
 <nav>
   <div class="nav-brand" style="cursor:pointer" onclick="goStep(0)">◈ ROOK</div>
-  <button class="nav-cta" onclick="goStep('closing')">Early Access</button>
+  <button class="nav-cta" onclick="goStep('closing')">Get Started</button>
 </nav>
 
 <!-- HERO -->
 <section id="hero">
-  <div class="hero-badge"><span></span> Early Access · September 2026 · TestMu AI</div>
+  <div class="hero-badge"><span></span> Now available · TestMu AI</div>
   <h1 class="hero-title">Your agent says<br>it worked.<br><span class="dim">Prove it.</span></h1>
   <p class="hero-sub">Rook verifies AI agent behavior by what it <em>did</em> — tool calls, file writes, API requests — not what it <em>claimed</em>.</p>
 
@@ -1334,10 +1334,10 @@ footer a { color: var(--accent); text-decoration: none; }
 <!-- CLOSING -->
 <section id="closing">
   <h2 class="closing-title reveal">Your agent says it worked.<br><span class="dim">Now you can prove it.</span></h2>
-  <p class="closing-sub reveal">Join teams shipping AI agents with confidence. Early access open now.</p>
+  <p class="closing-sub reveal">Join teams shipping AI agents with confidence. Available now — install in one command.</p>
   <div class="closing-cmd reveal">npx @testmuai/rook-skill@latest</div>
   <div class="reveal" style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
-    <button class="btn-primary">Request Early Access</button>
+    <button class="btn-primary">Get Started</button>
     <button class="btn-ghost">Read the Docs</button>
   </div>
 </section>
@@ -2001,7 +2001,7 @@ async function startLiveRun(force) {
 // ═══════════════════════════════════════════
 const STEPS = [
   ['hero','Intro'],['problem','Problem'],['scenes','Real Failures'],['pipeline','How It Works'],
-  ['verdicts','Verdicts'],['redteam','Red Team'],['compare','Compare'],['local','Run Local'],['closing','Early Access']
+  ['verdicts','Verdicts'],['redteam','Red Team'],['compare','Compare'],['local','Run Local'],['closing','Get Started']
 ].filter(([id]) => document.getElementById(id));
 let stepIdx = 0;
 function goStep(t) {
