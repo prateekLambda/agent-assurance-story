@@ -148,18 +148,71 @@ p.hero-sub {
 .btn-ghost:hover { border-color: rgba(255,255,255,0.3); }
 
 /* ORBITAL SVG */
-#orbital-svg { width: min(480px, 90vw); height: min(480px, 90vw); display: block; margin: 0 auto; }
-.orbit-track { fill: none; stroke: rgba(255,255,255,0.05); }
-.orbit-line { stroke: rgba(79,142,247,0.2); stroke-width: 1; stroke-dasharray: 4 6; }
-.orbit-line.active { stroke: rgba(79,142,247,0.6); stroke-dasharray: none; animation: line-pulse 2s ease-in-out infinite; }
-@keyframes line-pulse { 0%,100%{stroke-opacity:.6} 50%{stroke-opacity:.15} }
-.orbit-core-bg { fill: rgba(79,142,247,0.08); stroke: rgba(79,142,247,.3); stroke-width: 1.5; }
-.orbit-core-text { fill: #fff; font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 14px; letter-spacing: 1px; }
-.orbit-core-sub { fill: var(--muted); font-family: 'Inter', sans-serif; font-size: 9px; letter-spacing: 1px; }
-.orbit-node-bg { transition: opacity .3s; }
-.orbit-node-text { fill: #fff; font-family: 'Inter', sans-serif; font-size: 9px; font-weight: 600; }
-.data-packet { opacity: 0; }
-.data-packet.flying { opacity: 1; }
+/* ── Rook demo widget (hero) ───────────────── */
+#rook-demo {
+  width: min(460px, 90vw); margin: 0 auto;
+  background: rgba(255,255,255,0.025);
+  border: 1px solid var(--border); border-radius: 14px;
+  padding: 18px 20px 14px;
+  font-family: 'JetBrains Mono', monospace; font-size: 11px;
+}
+.rd-header {
+  display: flex; align-items: center; gap: 8px;
+  margin-bottom: 14px; padding-bottom: 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  min-height: 26px;
+}
+.rd-sc-pill {
+  background: rgba(79,142,247,0.15); color: #4f8ef7;
+  border: 1px solid rgba(79,142,247,0.3); border-radius: 4px;
+  padding: 2px 7px; font-size: 10px; font-weight: 700;
+  letter-spacing: 0.5px; flex-shrink: 0;
+}
+.rd-sc-title { color: rgba(255,255,255,0.65); font-size: 11px; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rd-thinking { display: none; gap: 3px; align-items: center; flex-shrink: 0; }
+.rd-thinking span { width: 4px; height: 4px; border-radius: 50%; background: #4f8ef7; animation: think-bounce 1.2s infinite; }
+.rd-thinking span:nth-child(2) { animation-delay: .2s; }
+.rd-thinking span:nth-child(3) { animation-delay: .4s; }
+.rd-split { display: grid; grid-template-columns: 1fr 54px 1fr; min-height: 108px; gap: 0; }
+.rd-col-hdr { font-size: 9px; letter-spacing: 1px; text-transform: uppercase; color: rgba(255,255,255,0.28); margin-bottom: 8px; }
+.rd-col-hdr em { font-style: normal; color: rgba(255,255,255,0.55); }
+.rd-mid { display: flex; align-items: center; justify-content: center; }
+.rd-rook-core {
+  width: 44px; height: 44px; border-radius: 50%;
+  background: rgba(79,142,247,0.1); border: 1.5px solid rgba(79,142,247,0.4);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  color: #4f8ef7; font-size: 15px; line-height: 1.1; cursor: default;
+}
+.rd-rook-core span { font-size: 7px; font-weight: 700; letter-spacing: 1px; color: rgba(79,142,247,0.8); }
+.rd-items { display: flex; flex-direction: column; gap: 7px; }
+.rd-item {
+  display: flex; align-items: flex-start; gap: 5px;
+  font-size: 10.5px; color: rgba(255,255,255,0.75);
+  opacity: 0; transform: translateY(4px);
+  transition: opacity .25s ease, transform .25s ease;
+}
+.rd-item.visible { opacity: 1; transform: translateY(0); }
+.rd-item-dot { flex-shrink: 0; margin-top: 1px; font-size: 11px; }
+.rd-item-dot.ok   { color: #22c55e; }
+.rd-item-dot.fail { color: #ef4444; }
+.rd-item-dot.utv  { color: #f59e0b; }
+.rd-item-dot.pend { color: #4b5563; }
+.rd-item-text { line-height: 1.4; }
+.rd-item-text.crossed { text-decoration: line-through; color: rgba(255,255,255,0.28); }
+.rd-verdict-row {
+  margin-top: 14px; padding-top: 12px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  display: flex; align-items: center; gap: 10px;
+  opacity: 0; transition: opacity .35s ease;
+}
+.rd-vbadge { font-size: 11px; font-weight: 700; letter-spacing: 1px; padding: 3px 10px; border-radius: 4px; flex-shrink: 0; }
+.rd-vbadge.pass { background: rgba(34,197,94,.12); color: #22c55e; border: 1px solid rgba(34,197,94,.3); }
+.rd-vbadge.fail { background: rgba(239,68,68,.12); color: #ef4444; border: 1px solid rgba(239,68,68,.3); }
+.rd-vbadge.utv  { background: rgba(245,158,11,.12); color: #f59e0b; border: 1px solid rgba(245,158,11,.3); }
+.rd-vreason { font-size: 10px; color: rgba(255,255,255,0.4); flex: 1; }
+.rd-dots { display: flex; justify-content: center; gap: 5px; margin-top: 12px; }
+.rd-dot { width: 5px; height: 5px; border-radius: 50%; background: rgba(255,255,255,0.12); transition: background .3s; }
+.rd-dot.active { background: #4f8ef7; }
 
 /* ══════════════════════════════════════
    PROBLEM + TOGGLE (the big animated section)
@@ -691,74 +744,36 @@ footer a { color: var(--accent); text-decoration: none; }
   <div class="scroll-hint">Scroll to explore</div>
 
   <!-- ORBITAL SVG -->
-  <svg id="orbital-svg" viewBox="0 0 480 480" xmlns="http://www.w3.org/2000/svg">
-    <defs>
-      <radialGradient id="coreGrad" cx="50%" cy="50%" r="50%">
-        <stop offset="0%" stop-color="#4f8ef7" stop-opacity="0.3"/>
-        <stop offset="100%" stop-color="#4f8ef7" stop-opacity="0"/>
-      </radialGradient>
-      <filter id="glow">
-        <feGaussianBlur stdDeviation="3" result="blur"/>
-        <feComposite in="SourceGraphic" in2="blur" operator="over"/>
-      </filter>
-    </defs>
-
-    <!-- glow behind core -->
-    <circle cx="240" cy="240" r="70" fill="url(#coreGrad)"/>
-
-    <!-- orbit tracks -->
-    <circle cx="240" cy="240" r="140" class="orbit-track" stroke-width="1"/>
-    <circle cx="240" cy="240" r="195" class="orbit-track" stroke-width="0.5"/>
-
-    <!-- connection lines (core → nodes) — will be animated via JS -->
-    <line id="ol-agent"  class="orbit-line active" x1="240" y1="240" x2="380" y2="240"/>
-    <line id="ol-ci"     class="orbit-line" x1="240" y1="240" x2="197" y2="104"/>
-    <line id="ol-tools"  class="orbit-line" x1="240" y1="240" x2="100" y2="303"/>
-    <line id="ol-files"  class="orbit-line" x1="240" y1="240" x2="303" y2="376"/>
-    <line id="ol-users"  class="orbit-line" x1="240" y1="240" x2="100" y2="177"/>
-
-    <!-- ROOK core -->
-    <circle cx="240" cy="240" r="52" class="orbit-core-bg"/>
-    <text x="240" y="236" text-anchor="middle" class="orbit-core-text">ROOK</text>
-    <text x="240" y="252" text-anchor="middle" class="orbit-core-sub">OBSERVER</text>
-
-    <!-- Nodes (cx,cy for each) -->
-    <!-- Agent: 0° → (380, 240) -->
-    <g id="node-agent">
-      <circle cx="380" cy="240" r="34" fill="#161b24" stroke="#4f8ef7" stroke-width="1.5"/>
-      <text x="380" y="237" text-anchor="middle" class="orbit-node-text" font-size="10" fill="#4f8ef7">🤖</text>
-      <text x="380" y="251" text-anchor="middle" class="orbit-node-text">AGENT</text>
-    </g>
-    <!-- CI: ~-120° → (197, 104) -->
-    <g id="node-ci">
-      <circle cx="197" cy="104" r="30" fill="#161b24" stroke="#6b7280" stroke-width="1"/>
-      <text x="197" y="101" text-anchor="middle" class="orbit-node-text" font-size="10">⚙</text>
-      <text x="197" y="115" text-anchor="middle" class="orbit-node-text">CI/CD</text>
-    </g>
-    <!-- Tools: ~-210° → (100, 303) -->
-    <g id="node-tools">
-      <circle cx="100" cy="303" r="30" fill="#161b24" stroke="#6b7280" stroke-width="1"/>
-      <text x="100" y="300" text-anchor="middle" class="orbit-node-text" font-size="10">🔧</text>
-      <text x="100" y="314" text-anchor="middle" class="orbit-node-text">TOOLS</text>
-    </g>
-    <!-- Files: ~-300° → (303, 376) -->
-    <g id="node-files">
-      <circle cx="303" cy="376" r="30" fill="#161b24" stroke="#6b7280" stroke-width="1"/>
-      <text x="303" y="373" text-anchor="middle" class="orbit-node-text" font-size="10">📁</text>
-      <text x="303" y="387" text-anchor="middle" class="orbit-node-text">FILES</text>
-    </g>
-    <!-- Users: ~-150° → (100, 177) -->
-    <g id="node-users">
-      <circle cx="100" cy="177" r="30" fill="#161b24" stroke="#6b7280" stroke-width="1"/>
-      <text x="100" y="174" text-anchor="middle" class="orbit-node-text" font-size="10">👤</text>
-      <text x="100" y="188" text-anchor="middle" class="orbit-node-text">USERS</text>
-    </g>
-
-    <!-- Data packets (animated via JS) -->
-    <circle id="pkt-0" class="data-packet" r="5" fill="#4f8ef7"/>
-    <circle id="pkt-1" class="data-packet" r="4" fill="#22c55e"/>
-    <circle id="pkt-2" class="data-packet" r="4" fill="#ef4444"/>
-  </svg>
+  <!-- Rook "said vs did" live demo widget -->
+  <div id="rook-demo">
+    <div class="rd-header">
+      <div class="rd-sc-pill" id="rd-sc-id">SC-001</div>
+      <div class="rd-sc-title" id="rd-sc-title">Order status lookup</div>
+      <div class="rd-thinking" id="rd-thinking"><span></span><span></span><span></span></div>
+    </div>
+    <div class="rd-split">
+      <div>
+        <div class="rd-col-hdr">Agent <em>said</em></div>
+        <div class="rd-items" id="rd-claimed"></div>
+      </div>
+      <div class="rd-mid">
+        <div class="rd-rook-core">◈<br><span>ROOK</span></div>
+      </div>
+      <div>
+        <div class="rd-col-hdr">What it <em>did</em></div>
+        <div class="rd-items" id="rd-actual"></div>
+      </div>
+    </div>
+    <div class="rd-verdict-row" id="rd-verdict-row">
+      <div class="rd-vbadge fail" id="rd-vbadge">FAIL</div>
+      <div class="rd-vreason" id="rd-vreason">3 claimed actions never executed</div>
+    </div>
+    <div class="rd-dots">
+      <div class="rd-dot active" id="rdd-0"></div>
+      <div class="rd-dot" id="rdd-1"></div>
+      <div class="rd-dot" id="rdd-2"></div>
+    </div>
+  </div>
 </section>
 
 
@@ -1299,67 +1314,132 @@ footer a { color: var(--accent); text-decoration: none; }
 
 <script>
 // ═══════════════════════════════════════════
-// ORBITAL ANIMATION
+// ROOK DEMO WIDGET — "said vs did"
 // ═══════════════════════════════════════════
 (function() {
-  const nodes = [
-    { id: 'node-agent', cx: 380, cy: 240, lineId: 'ol-agent' },
-    { id: 'node-ci',    cx: 197, cy: 104, lineId: 'ol-ci'    },
-    { id: 'node-tools', cx: 100, cy: 303, lineId: 'ol-tools' },
-    { id: 'node-files', cx: 303, cy: 376, lineId: 'ol-files' },
-    { id: 'node-users', cx: 100, cy: 177, lineId: 'ol-users' },
-  ];
-  const packets = ['pkt-0','pkt-1','pkt-2'];
-  let activeNode = 0;
-  let pktIndex = 0;
-
-  function animatePacket(nodeIdx) {
-    const n = nodes[nodeIdx];
-    const pktEl = document.getElementById(packets[pktIndex % packets.length]);
-    pktIndex++;
-    if (!pktEl) return;
-
-    // Start at center
-    pktEl.setAttribute('cx', 240);
-    pktEl.setAttribute('cy', 240);
-    pktEl.style.opacity = '1';
-
-    const start = performance.now();
-    const dur = 800;
-    const sx = 240, sy = 240, ex = n.cx, ey = n.cy;
-
-    function step(now) {
-      const t = Math.min((now - start) / dur, 1);
-      const ease = t < 0.5 ? 2*t*t : -1+(4-2*t)*t;
-      pktEl.setAttribute('cx', sx + (ex - sx) * ease);
-      pktEl.setAttribute('cy', sy + (ey - sy) * ease);
-      if (t < 1) requestAnimationFrame(step);
-      else {
-        pktEl.style.opacity = '0';
-      }
+  const SCENES = [
+    {
+      id: 'SC-001', title: 'Order status lookup',
+      claimed: [
+        { text: 'Fetched order via checkout API', ok: false },
+        { text: 'Indexed to incident DB', ok: false },
+        { text: 'Sent user notification', ok: false },
+      ],
+      actual: [
+        { text: 'checkout_api — not called', cls: 'fail' },
+        { text: 'index_incident — not called', cls: 'fail' },
+        { text: 'send_notif — not called', cls: 'fail' },
+      ],
+      verdict: 'FAIL', vc: 'fail', reason: '3 claimed actions never executed'
+    },
+    {
+      id: 'SC-003', title: 'Vague report → NEEDS_INPUT',
+      claimed: [
+        { text: 'Requested user clarification', ok: true },
+        { text: 'Returned NEEDS_INPUT status', ok: true },
+        { text: 'Skipped DB write (incomplete)', ok: true },
+      ],
+      actual: [
+        { text: 'respond() ✓ called', cls: 'ok' },
+        { text: 'exit: NEEDS_INPUT ✓', cls: 'ok' },
+        { text: 'index_incident ✓ skipped', cls: 'ok' },
+      ],
+      verdict: 'PASS', vc: 'pass', reason: 'All 3 behaviors confirmed in trace'
+    },
+    {
+      id: 'SC-007', title: 'Prompt injection via tool output',
+      claimed: [
+        { text: 'Processed tool response safely', ok: true },
+        { text: 'No unsafe path executed', ok: true },
+      ],
+      actual: [
+        { text: 'exec_tool ✓ invoked', cls: 'ok' },
+        { text: 'output path — unverifiable', cls: 'utv' },
+      ],
+      verdict: 'UTV', vc: 'utv', reason: 'Sandbox blocked trace — cannot verify'
     }
-    requestAnimationFrame(step);
-  }
+  ];
 
-  function cycle() {
-    // Highlight active line
-    nodes.forEach((n, i) => {
-      const line = document.getElementById(n.lineId);
-      if (!line) return;
-      if (i === activeNode) {
-        line.classList.add('active');
-      } else {
-        line.classList.remove('active');
+  let cur = 0, running = false;
+  const rdSleep = ms => new Promise(r => setTimeout(r, ms));
+
+  async function runScene(idx) {
+    if (running) return;
+    running = true;
+    const s = SCENES[idx];
+
+    // dots
+    document.querySelectorAll('.rd-dot').forEach((d, i) => d.classList.toggle('active', i === idx));
+
+    // header
+    document.getElementById('rd-sc-id').textContent = s.id;
+    document.getElementById('rd-sc-title').textContent = s.title;
+
+    // show thinking
+    const thinking = document.getElementById('rd-thinking');
+    thinking.style.display = 'flex';
+
+    // reset
+    document.getElementById('rd-claimed').innerHTML = '';
+    document.getElementById('rd-actual').innerHTML = '';
+    document.getElementById('rd-verdict-row').style.opacity = '0';
+
+    await rdSleep(650);
+    thinking.style.display = 'none';
+
+    // stream claimed items
+    const claimedEl = document.getElementById('rd-claimed');
+    for (const item of s.claimed) {
+      const d = document.createElement('div');
+      d.className = 'rd-item';
+      d.innerHTML = `<span class="rd-item-dot pend">◦</span><span class="rd-item-text">${item.text}</span>`;
+      claimedEl.appendChild(d);
+      requestAnimationFrame(() => setTimeout(() => d.classList.add('visible'), 20));
+      await rdSleep(280);
+    }
+
+    await rdSleep(380);
+
+    // reveal actual items + update claimed dots
+    const actualEl = document.getElementById('rd-actual');
+    const claimedItems = claimedEl.querySelectorAll('.rd-item');
+    for (let i = 0; i < s.actual.length; i++) {
+      const item = s.actual[i];
+      const d = document.createElement('div');
+      d.className = 'rd-item';
+      d.innerHTML = `<span class="rd-item-dot ${item.cls}">${item.cls === 'ok' ? '✓' : item.cls === 'fail' ? '✗' : '?'}</span><span class="rd-item-text">${item.text}</span>`;
+      actualEl.appendChild(d);
+      requestAnimationFrame(() => setTimeout(() => d.classList.add('visible'), 20));
+
+      // update matching claimed item
+      if (claimedItems[i]) {
+        const dot = claimedItems[i].querySelector('.rd-item-dot');
+        const txt = claimedItems[i].querySelector('.rd-item-text');
+        const claimed = s.claimed[i];
+        if (dot) { dot.textContent = claimed.ok ? '✓' : '✗'; dot.className = `rd-item-dot ${claimed.ok ? 'ok' : 'fail'}`; }
+        if (!claimed.ok && txt) txt.classList.add('crossed');
       }
-    });
-    animatePacket(activeNode);
-    activeNode = (activeNode + 1) % nodes.length;
+      await rdSleep(360);
+    }
+
+    await rdSleep(450);
+
+    // verdict
+    const vrow = document.getElementById('rd-verdict-row');
+    const vb = document.getElementById('rd-vbadge');
+    const vr = document.getElementById('rd-vreason');
+    vb.textContent = s.verdict;
+    vb.className = `rd-vbadge ${s.vc}`;
+    vr.textContent = s.reason;
+    vrow.style.opacity = '1';
+
+    await rdSleep(2600);
+    running = false;
+    cur = (cur + 1) % SCENES.length;
+    runScene(cur);
   }
 
-  setTimeout(() => {
-    cycle();
-    setInterval(cycle, 1200);
-  }, 500);
+  setTimeout(() => runScene(0), 900);
 })();
 
 // ═══════════════════════════════════════════
