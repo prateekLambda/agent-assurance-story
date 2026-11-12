@@ -732,13 +732,7 @@ footer a { color: var(--accent); text-decoration: none; }
 <!-- NAV -->
 <nav>
   <div class="nav-brand">◈ ROOK</div>
-  <div class="nav-links">
-    <a href="#problem">Problem</a>
-    <a href="#scenes">Scenarios</a>
-    <a href="#pipeline">How It Works</a>
-    <a href="#verdicts">Verdicts</a>
-  </div>
-  <button class="nav-cta" onclick="document.getElementById('closing').scrollIntoView({behavior:'smooth'})">Early Access</button>
+  <button class="nav-cta" onclick="document.getElementById('closing').scrollIntoView()">Early Access</button>
 </nav>
 
 <!-- HERO -->
@@ -747,8 +741,10 @@ footer a { color: var(--accent); text-decoration: none; }
   <h1 class="hero-title">Your agent says<br>it worked.<br><span class="dim">Prove it.</span></h1>
   <p class="hero-sub">Rook verifies AI agent behavior by what it <em>did</em> — tool calls, file writes, API requests — not what it <em>claimed</em>.</p>
   <div class="hero-actions">
-    <button class="btn-primary" onclick="document.getElementById('scenes').scrollIntoView({behavior:'smooth'})">See Real Failures →</button>
-    <button class="btn-ghost" onclick="document.getElementById('pipeline').scrollIntoView({behavior:'smooth'})">How It Works</button>
+    <button class="btn-ghost" onclick="document.getElementById('problem').scrollIntoView()">The Problem</button>
+    <button class="btn-primary" onclick="document.getElementById('scenes').scrollIntoView()">See Real Failures →</button>
+    <button class="btn-ghost" onclick="document.getElementById('pipeline').scrollIntoView()">How It Works</button>
+    <button class="btn-ghost" onclick="document.getElementById('verdicts').scrollIntoView()">Verdicts</button>
   </div>
 
   <div class="scroll-hint">Scroll to explore</div>
