@@ -157,6 +157,36 @@ p.hero-sub {
 .wd-chk { transition: stroke .3s, fill .3s; }
 .wd-chk.on { stroke: #4f8ef7; fill: rgba(79,142,247,0.2); }
 .wd-src.on { fill: rgba(79,142,247,0.3); }
+
+/* ── Step mode (one section at a time) ── */
+body.step-mode > section, body.step-mode > footer { display: none; }
+body.step-mode > section.step-on { display: flex; flex-direction: column; animation: step-in .35s ease; }
+body.step-mode > section#hero.step-on { align-items: center; justify-content: center; }
+body.step-mode > footer.step-on { display: block; }
+body.step-mode { padding-bottom: 84px; }
+@keyframes step-in { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+#stepbar {
+  position: fixed; left: 50%; bottom: 16px; transform: translateX(-50%); z-index: 200;
+  display: flex; align-items: center; gap: 8px; padding: 8px 10px;
+  background: rgba(15,18,24,0.92); backdrop-filter: blur(12px);
+  border: 1px solid rgba(79,142,247,0.3); border-radius: 14px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.5); max-width: 96vw;
+}
+#stepbar button.sb-nav {
+  background: #4f8ef7; color: #fff; border: 0; border-radius: 9px;
+  padding: 9px 16px; font: 600 13px Inter, sans-serif; cursor: pointer; white-space: nowrap;
+}
+#stepbar button.sb-nav.ghost { background: transparent; color: #cbd5e1; border: 1px solid rgba(255,255,255,0.15); }
+#stepbar button.sb-nav:disabled { opacity: .3; cursor: default; }
+.sb-steps { display: flex; gap: 4px; overflow-x: auto; }
+.sb-step {
+  background: transparent; border: 0; color: #6b7280; cursor: pointer;
+  font: 600 12px Inter, sans-serif; padding: 7px 10px; border-radius: 8px; white-space: nowrap;
+}
+.sb-step:hover { color: #e5e7eb; background: rgba(255,255,255,0.05); }
+.sb-step.on { color: #fff; background: rgba(79,142,247,0.2); }
+.sb-step .n { color: #4f8ef7; margin-right: 5px; }
+@media (max-width: 760px) { .sb-step .lbl { display: none; } .sb-step .n { margin: 0; } }
 /* ── Rook demo widget (hero) ───────────────── */
 #rook-demo {
   width: min(760px, 92vw); margin: 0 auto; text-align: left;
@@ -731,8 +761,8 @@ footer a { color: var(--accent); text-decoration: none; }
 
 <!-- NAV -->
 <nav>
-  <div class="nav-brand">◈ ROOK</div>
-  <button class="nav-cta" onclick="document.getElementById('closing').scrollIntoView()">Early Access</button>
+  <div class="nav-brand" style="cursor:pointer" onclick="goStep(0)">◈ ROOK</div>
+  <button class="nav-cta" onclick="goStep('closing')">Early Access</button>
 </nav>
 
 <!-- HERO -->
@@ -741,13 +771,13 @@ footer a { color: var(--accent); text-decoration: none; }
   <h1 class="hero-title">Your agent says<br>it worked.<br><span class="dim">Prove it.</span></h1>
   <p class="hero-sub">Rook verifies AI agent behavior by what it <em>did</em> — tool calls, file writes, API requests — not what it <em>claimed</em>.</p>
   <div class="hero-actions">
-    <button class="btn-ghost" onclick="document.getElementById('problem').scrollIntoView()">The Problem</button>
-    <button class="btn-primary" onclick="document.getElementById('scenes').scrollIntoView()">See Real Failures →</button>
-    <button class="btn-ghost" onclick="document.getElementById('pipeline').scrollIntoView()">How It Works</button>
-    <button class="btn-ghost" onclick="document.getElementById('verdicts').scrollIntoView()">Verdicts</button>
+    <button class="btn-ghost" onclick="goStep('problem')">The Problem</button>
+    <button class="btn-primary" onclick="goStep('scenes')">See Real Failures →</button>
+    <button class="btn-ghost" onclick="goStep('pipeline')">How It Works</button>
+    <button class="btn-ghost" onclick="goStep('verdicts')">Verdicts</button>
   </div>
 
-  <div class="scroll-hint">Scroll to explore</div>
+  
 
   <!-- ORBITAL SVG -->
   <!-- Rook "said vs did" live demo widget -->
@@ -1316,6 +1346,7 @@ footer a { color: var(--accent); text-decoration: none; }
   </div>
 </section>
 
+<div id="stepbar"><button class="sb-nav ghost" id="sb-prev" onclick="goStep(stepIdx-1)">← Back</button><div class="sb-steps" id="sb-steps"></div><button class="sb-nav" id="sb-next" onclick="goStep(stepIdx+1)">Next →</button></div>
 <footer>
   <p>© 2026 TestMu AI · <a href="#">rook.testmuai.com</a> · Built for teams shipping AI agents</p>
 </footer>
@@ -1967,6 +1998,53 @@ async function startLiveRun(force) {
     }
   }, { threshold: 0.25 });
   lrObs.observe(lrEl);
+})();
+
+// ═══════════════════════════════════════════
+// STEP MODE — one section at a time
+// ═══════════════════════════════════════════
+const STEPS = [
+  ['hero','Intro'],['problem','Problem'],['scenes','Real Failures'],['pipeline','How It Works'],
+  ['verdicts','Verdicts'],['redteam','Red Team'],['compare','Compare'],['local','Run Local'],['closing','Early Access']
+].filter(([id]) => document.getElementById(id));
+let stepIdx = 0;
+function goStep(t) {
+  const i = typeof t === 'string' ? STEPS.findIndex(s => s[0] === t) : t;
+  if (i < 0 || i >= STEPS.length) return;
+  stepIdx = i;
+  STEPS.forEach(([id], j) => document.getElementById(id).classList.toggle('step-on', j === i));
+  const ft = document.querySelector('footer'); if (ft) ft.classList.toggle('step-on', i === STEPS.length - 1);
+  const sec = document.getElementById(STEPS[i][0]);
+  sec.querySelectorAll('.reveal').forEach(e => e.classList.add('visible'));
+  document.querySelectorAll('.sb-step').forEach((b, j) => b.classList.toggle('on', j === i));
+  const on = document.querySelector('.sb-step.on'); if (on) on.scrollIntoView({ block: 'nearest', inline: 'center' });
+  document.getElementById('sb-prev').disabled = i === 0;
+  const nx = document.getElementById('sb-next');
+  nx.disabled = i === STEPS.length - 1;
+  nx.textContent = i < STEPS.length - 1 ? STEPS[i+1][1] + ' →' : 'Done';
+  window.scrollTo(0, 0);
+  history.replaceState(null, '', '#' + STEPS[i][0]);
+}
+(function(){
+  document.body.classList.add('step-mode');
+  const wrap = document.getElementById('sb-steps');
+  STEPS.forEach(([id, lbl], j) => {
+    const b = document.createElement('button');
+    b.className = 'sb-step'; b.innerHTML = `<span class="n">${j+1}</span><span class="lbl">${lbl}</span>`;
+    b.onclick = () => goStep(j); wrap.appendChild(b);
+  });
+  document.addEventListener('click', e => {
+    const a = e.target.closest('a[href^="#"]'); if (!a) return;
+    const id = a.getAttribute('href').slice(1);
+    if (STEPS.some(s => s[0] === id)) { e.preventDefault(); goStep(id); }
+  });
+  document.addEventListener('keydown', e => {
+    if (e.target.closest('input,textarea')) return;
+    if (e.key === 'ArrowRight' || e.key === 'PageDown') { goStep(stepIdx+1); e.preventDefault(); }
+    if (e.key === 'ArrowLeft' || e.key === 'PageUp') { goStep(stepIdx-1); e.preventDefault(); }
+  });
+  const h = location.hash.slice(1);
+  goStep(STEPS.some(s => s[0] === h) ? h : 0);
 })();
 </script>
 </body>
