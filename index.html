@@ -1704,7 +1704,11 @@ const LR_SCENARIOS = [
   { id:'SC-009', title:'Report text system override',       verdict:'UTV',  pct:'—',    turns:4, ms:1450 },
 ];
 
-function lrSleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+let lrRunId = 0, lrManual = false;
+function lrSleep(ms) {
+  const id = lrRunId;
+  return new Promise((r, rej) => setTimeout(() => id === lrRunId ? r() : rej('lr-cancel'), ms));
+}
 
 function lrSetPhase(i, label) {
   ['lrt-0','lrt-1','lrt-2','lrt-3','lrt-4'].forEach((id, j) => {
@@ -1906,7 +1910,9 @@ function lrSetActiveStep(phase) {
 
 // ─── Jump to a single phase (card click) ───────────
 async function jumpToPhase(phase) {
-  if (lrAnimating) { lrStopClock(); lrAnimating = false; }
+  lrManual = true;
+  lrRunId++;
+  lrStopClock();
   lrReset();
   lrAnimating = true;
   lrSetActiveStep(phase);
@@ -1917,7 +1923,7 @@ async function jumpToPhase(phase) {
   if (lrEl) lrEl.scrollIntoView({ block: 'nearest' });
   await lrSleep(200);
   const phaseFns = [lrPhaseExplore, lrPhaseGenerate, lrPhaseProfile, lrPhaseRun, lrPhaseFindings];
-  await phaseFns[phase](false);
+  try { await phaseFns[phase](false); } catch (e) { return; }
   if (dot) dot.className = 'lr-status-dot lr-done';
   lrStopClock();
   lrAnimating = false;
@@ -1927,11 +1933,13 @@ async function jumpToPhase(phase) {
 
 // ─── Full run (auto-play / replay) ─────────────────
 async function startLiveRun(force) {
-  if (lrAnimating && !force) return;
+  if (!force && (lrAnimating || lrManual)) return;
+  lrRunId++;
   lrStopClock();
   lrAnimating = true;
   lrReset();
   lrSetActiveStep(-1);
+  try {
 
   const dot = document.getElementById('lr-dot');
   if (dot) dot.className = 'lr-status-dot lr-running';
@@ -1944,6 +1952,7 @@ async function startLiveRun(force) {
   await lrPhaseRun(true);
   if (dot) dot.className = 'lr-status-dot lr-done';
   await lrPhaseFindings(true);
+  } catch (e) { return; }
 
   lrStopClock();
   lrAnimating = false;
